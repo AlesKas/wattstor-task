@@ -10,6 +10,7 @@ def absolute_error_statistics(original : np.array, predicted : np.array):
     assert len(original) == len(predicted)
     return np.absolute(original - predicted)
 
+# Class representing the Dataset
 class CNNDataset(Dataset):
     def __init__(self,feature,target):
         self.feature = feature
@@ -57,6 +58,7 @@ class CNN():
         self.criterion = nn.MSELoss()
         train_len = int(len(self.data[quantity]) * 0.80)
 
+        # Split datasets into the train and test
         self.train_data = self.data[quantity][:train_len]
         self.test_data = self.data[quantity][train_len:]
 
@@ -91,6 +93,8 @@ class CNN():
                 self.data.at[item, key] = new_value
                 new_value += fill_data
 
+    # Helper function to crate input values to the model
+    # Format: [dato1, dato2, dato3], [predicted_value]
     def split_sequence(self, sequence, n_steps):
         x, y = list(), list()
         for i in range(len(sequence)):    

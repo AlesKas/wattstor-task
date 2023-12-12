@@ -14,6 +14,7 @@ class AR():
 
         self.fill_missing_data()
 
+        # Values obtained from the jupyyer notebook
         self.lag_info = {
             'Consumption': {'order': 1, 'lags': 96}, 
             'Grid consumption': {'order': 1, 'lags': 101}, 
@@ -23,10 +24,12 @@ class AR():
             'Grid backflow' : {'lags' : 1}
         }
 
+        # Split the data to train and test datasets
         self.X = self.data[quantity].values
         size = int(len(self.X) * 0.80)
         self.train, self.test = self.X[0:size], self.X[size:len(self.X)]
   
+        # Obtain the optimal number of lags and fit the model
         self.number_of_lags = self.lag_info[quantity]['lags']
         self.model = AutoReg(self.train, lags=self.number_of_lags)
         self.model_fit = self.model.fit()

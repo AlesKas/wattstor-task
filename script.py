@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 from AR import AR
 from CNN import CNN, absolute_error_statistics
 
+# Plot the difference between the predicted and actual values
 def plot(data, train, test, predictions):
     padding = len(data.index[len(train):]) - len(predictions)
     plt.figure(figsize=(30,7))
@@ -18,10 +19,12 @@ def plot(data, train, test, predictions):
     plt.legend(loc='best')
     plt.show()
 
+# Dispatcher function to train and evaluate the models
 def dispatch(file, quantity, method):
     if method.upper() == 'CNN':
         cnn = CNN(file, quantity)
         print("---------------------------Training the CNN model---------------------------")
+        # Train the model for 200 epochs
         for epoch in range(200):
             loss = cnn.train()
             if epoch % 10 == 0:
@@ -55,9 +58,11 @@ if __name__ == '__main__':
     args = parser.parse_args()
     
     file = args.input
+    # For when the input quantity contains space
     quantity = ' '.join(args.quantity)
     method = args.method
 
+    # Only two methods supported
     if method.upper() not in ['CNN', 'AR']:
         raise Exception('Unsupported method, method shoud be either CNN, or AR.')
     
