@@ -8,10 +8,11 @@ from AR import AR
 from CNN import CNN, absolute_error_statistics
 
 def plot(data, train, test, predictions):
+    padding = len(data.index[len(train):]) - len(predictions)
     plt.figure(figsize=(30,7))
     plt.plot(data.index[len(train) - 100:len(train)], train[len(train) - 100:], color='b', label='train')
     plt.plot(data.index[len(train):], test, color='g', label='ground truth')
-    plt.plot(data.index[len(train):], predictions, color='r', label='predicted')
+    plt.plot(data.index[len(train) + padding:], predictions, color='r', label='predicted')
     plt.xticks([])
     plt.title("Difference between test and predicted data")
     plt.legend(loc='best')
