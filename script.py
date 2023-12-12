@@ -21,29 +21,29 @@ def plot(data, train, test, predictions):
 def dispatch(file, quantity, method):
     if method.upper() == 'CNN':
         cnn = CNN(file, quantity)
+        print("---------------------------Training the CNN model---------------------------")
         for epoch in range(200):
             loss = cnn.train()
             if epoch % 10 == 0:
-                print(f"Loss: {loss}")
+                print(f"Error: {loss}")
         
         error, predicted, actual = cnn.evaluate()
-        print(f"Error on test dataset: {error}")
+        print(f"MSE on test dataset: {error}")
         stat = absolute_error_statistics(np.array(actual), np.array(predicted))
         df = pd.DataFrame(stat)
         df = df.describe()
-        print(f"Absolute error on test data:")
-        print(df)
+        print(f"\nMean absolute error on test data: {df[0]['mean']}, median error: {df[0]['50%']}")
         plot(cnn.data, cnn.train_data, cnn.test_data, predicted)
 
     else:
+        print("---------------------------Training the AR model----------------------------")
         ar = AR(file, quantity)
         error, predicted, actual = ar.evaluate()
-        print(f"Error on test dataset: {error}")
+        print(f"MSE on test dataset: {error}")
         stat = absolute_error_statistics(np.array(actual), np.array(predicted))
         df = pd.DataFrame(stat)
         df = df.describe()
-        print(f"Absolute error on test data:")
-        print(df)
+        print(f"\nMean absolute error on test data: {df[0]['mean']}, median error: {df[0]['50%']}")
         plot(ar.data, ar.train, ar.test, predicted)
     
 
