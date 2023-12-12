@@ -49,12 +49,12 @@ def dispatch(file, quantity, method):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('-i', '--input', help="Input file to process", required=True)
-    parser.add_argument('-q', '--quantity', help="Input column", required=True)
+    parser.add_argument('-q', '--quantity', help="Input column", required=True, nargs='+')
     parser.add_argument('-m', '--method', help="Input method, either CNN or AR", required=True)
     args = parser.parse_args()
     
     file = args.input
-    quantity = args.quantity
+    quantity = ' '.join(args.quantity)
     method = args.method
 
     if method.upper() not in ['CNN', 'AR']:
