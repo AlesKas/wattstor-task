@@ -14,7 +14,14 @@ class AR():
 
         self.fill_missing_data()
 
-        self.lag_info = {'Consumption': {'order': 1, 'lags': 96}, 'Grid consumption': {'order': 1, 'lags': 101}, 'PV generation': {'order': 1, 'lags': 11}, 'Battery discharging': {'order': 1, 'lags': 11}, 'Grid backflow' : {'lags' : 1}}
+        self.lag_info = {
+            'Consumption': {'order': 1, 'lags': 96}, 
+            'Grid consumption': {'order': 1, 'lags': 101}, 
+            'PV generation': {'order': 1, 'lags': 11}, 
+            'Battery charging' : {'lags' : 1},
+            'Battery discharging': {'order': 1, 'lags': 11}, 
+            'Grid backflow' : {'lags' : 1}
+        }
 
         self.X = self.data[quantity].values
         size = int(len(self.X) * 0.80)
