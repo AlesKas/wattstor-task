@@ -1,10 +1,20 @@
+import os
+
 import numpy as np
 import pandas as pd
+
+from utils import fill_missing_data
 from statsmodels.tsa.ar_model import AutoReg
 from sklearn.metrics import mean_squared_error
 
 class AR():
-    def __init__(self, input_file, quantity) -> None:
+    def __init__(self, input_file : str, quantity : str) -> None:
+        if not input_file.endswith('.csv'):
+            raise Exception('Only csv files supported.')
+        
+        if not os.path.isfile(input_file):
+            raise Exception('Provided file does not exist.')
+
         self.data = pd.read_csv(input_file, delimiter=';')
         self.data['Time'] = pd.to_datetime(self.data['Time'], utc=True)
         self.data.set_index('Time')
@@ -12,7 +22,7 @@ class AR():
         if quantity not in self.data.columns:
             raise Exception(f"{quantity} column not in data.")
 
-        self.fill_missing_data()
+        self.data = fill_missing_data(self.data)
 
         # Values obtained from the jupyyer notebook
         self.lag_info = {
@@ -34,26 +44,6 @@ class AR():
         self.model = AutoReg(self.train, lags=self.number_of_lags)
         self.model_fit = self.model.fit()
 
-    def fill_missing_data(self):
-        missing = {}
-        columns = [i for i in self.data.columns if i not in ['Time']]
-        for column in columns:
-            missing[column] = self.data[self.data[column].isna()].index.to_list()
-
-        for key, value in missing.items():
-            if len(value) == 0:
-                continue
-            start_index = value[0] - 1
-            end_index = value[-1] + 1
-
-            start_value = self.data[key][start_index]
-            end_value = self.data[key][end_index]
-
-            fill_data = float((end_value - start_value) / (len(value) + 1))
-            new_value = start_value + fill_data
-            for item in value:
-                self.data.at[item, key] = new_value
-                new_value += fill_data
 
     def evaluate(self):
         coef = self.model_fit.params

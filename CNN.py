@@ -1,9 +1,11 @@
+import os
 import torch
 
 import numpy as np
 import pandas as pd
 import torch.nn as nn
 
+from utils import  fill_missing_data
 from torch.utils.data import Dataset, DataLoader
 
 def absolute_error_statistics(original : np.array, predicted : np.array):
@@ -42,7 +44,13 @@ class TimeseriesCNN(nn.Module):
         return x
 
 class CNN():
-    def __init__(self, input_file, quantity) -> None:
+    def __init__(self, input_file : str, quantity : str) -> None:
+        if not input_file.endswith('.csv'):
+            raise Exception('Only csv files supported.')
+
+        if not os.path.isfile(input_file):
+            raise Exception('Provided file does not exist.')
+
         self.data = pd.read_csv(input_file, delimiter=';')
         self.data['Time'] = pd.to_datetime(self.data['Time'], utc=True)
         self.data.set_index('Time')
@@ -50,7 +58,7 @@ class CNN():
         if quantity not in self.data.columns:
             raise Exception(f"{quantity} column not in data.")
         
-        self.fill_missing_data()
+        self.data = fill_missing_data(self.data)
 
         self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         self.model = TimeseriesCNN().to(self.device)
@@ -71,27 +79,6 @@ class CNN():
 
         self.train_loader = DataLoader(self.train_dataset, batch_size=1)
         self.test_loader = DataLoader(self.test_dataset, batch_size=1)
-
-    def fill_missing_data(self):
-        missing = {}
-        columns = [i for i in self.data.columns if i not in ['Time']]
-        for column in columns:
-            missing[column] = self.data[self.data[column].isna()].index.to_list()
-
-        for key, value in missing.items():
-            if len(value) == 0:
-                continue
-            start_index = value[0] - 1
-            end_index = value[-1] + 1
-
-            start_value = self.data[key][start_index]
-            end_value = self.data[key][end_index]
-
-            fill_data = float((end_value - start_value) / (len(value) + 1))
-            new_value = start_value + fill_data
-            for item in value:
-                self.data.at[item, key] = new_value
-                new_value += fill_data
 
     # Helper function to crate input values to the model
     # Format: [dato1, dato2, dato3], [predicted_value]
