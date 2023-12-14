@@ -44,7 +44,7 @@ class TimeseriesCNN(nn.Module):
         return x
 
 class CNN():
-    def __init__(self, input_file : str, quantity : str) -> None:
+    def __init__(self, input_file : str, quantity : str, use_model : True) -> None:
         if not input_file.endswith('.csv'):
             raise Exception('Only csv files supported.')
 
@@ -61,7 +61,12 @@ class CNN():
         self.data = fill_missing_data(self.data)
 
         self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-        self.model = TimeseriesCNN().to(self.device)
+        if use_model:
+            self.model = TimeseriesCNN()
+            self.model.load_state_dict(torch.load(f'models/model_{quantity}.pt'))
+            self.model.to(self.device)
+        else:
+            self.model = TimeseriesCNN().to(self.device)
         self.optimizer = torch.optim.Adam(self.model.parameters(), lr=1e-6)
         self.criterion = nn.MSELoss()
         train_len = int(len(self.data[quantity]) * 0.80)
