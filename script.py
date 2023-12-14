@@ -24,18 +24,17 @@ def plot(data, train, test, predictions):
 # Dispatcher function to train and evaluate the models
 def dispatch(file, quantity, method):
     if method.upper() == 'CNN':
-        if os.path.isfile(f'models/model_{method}.pt'):
+        if os.path.isfile(f'models/model_{quantity}.pt'):
             cnn = CNN(file, quantity, True)
         else:
             cnn = CNN(file, quantity, False)
-        print("---------------------------Training the CNN model---------------------------")
-        # Train the model for 200 epochs
-        for epoch in range(300):
-            loss = cnn.train()
-            if epoch % 10 == 0:
-                print(f"Error: {loss}")
-        if not os.path.isfile(f'models/model_{method}.pt'):
-            torch.save(cnn.model.state_dict(), f'models/model_{method}.pt')
+            print("---------------------------Training the CNN model---------------------------")
+            # Train the model for 200 epochs
+            for epoch in range(300):
+                loss = cnn.train()
+                if epoch % 10 == 0:
+                    print(f"Error: {loss}")
+            torch.save(cnn.model.state_dict(), f'models/model_{quantity}.pt')
         
         error, predicted, actual = cnn.evaluate()
         print(f"MSE on test dataset: {error}")
